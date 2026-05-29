@@ -1,5 +1,7 @@
 # Deploy Guide
 
+Copyright (c) 2026 Jhon David (art. David Appleton). All rights reserved.
+
 This is a desktop application. There is no server deploy.
 
 ## Local Setup
@@ -42,4 +44,3 @@ python app.py
 - Use a separate Spotify Developer app for production distribution.
 - Package with PyInstaller only after testing the normal Python run path.
 - Do not bundle real credentials inside a packaged executable.
-

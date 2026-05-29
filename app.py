@@ -1,4 +1,8 @@
-"""Application entry point."""
+"""Application entry point.
+
+Copyright (c) 2026 Jhon David (art. David Appleton).
+All rights reserved.
+"""
 
 from __future__ import annotations
 

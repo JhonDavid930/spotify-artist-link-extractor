@@ -4,6 +4,12 @@ Desktop app in Python 3.11+ to extract official Spotify track links from a Spoti
 
 The app does not scrape Spotify pages, does not download audio, and only retrieves metadata plus official track URLs.
 
+## Ownership
+
+Copyright (c) 2026 Jhon David (art. David Appleton). All rights reserved.
+
+See [COPYRIGHT.md](COPYRIGHT.md) for the project authorship notice.
+
 ## Features
 
 - Paste Spotify artist, album, or track URLs/URIs.

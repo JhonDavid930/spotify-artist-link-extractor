@@ -1,5 +1,7 @@
 # Changelog
 
+Copyright (c) 2026 Jhon David (art. David Appleton). All rights reserved.
+
 ## 0.1.0 - 2026-05-27
 
 - Created PySide6 desktop app structure.
@@ -21,3 +23,4 @@
 - Improved rate-limit messages with actionable retry timing instead of a vague background wait.
 - Skipped the artist profile endpoint in default link-only mode to save one catalog request per extraction.
 - Added support for direct Spotify album and track URLs/URIs in addition to artist profiles.
+- Added project copyright notice for Jhon David (art. David Appleton).

@@ -1,4 +1,8 @@
-"""PySide6 main window for Spotify Artist Link Extractor."""
+"""PySide6 main window for Spotify Artist Link Extractor.
+
+Copyright (c) 2026 Jhon David (art. David Appleton).
+All rights reserved.
+"""
 
 from __future__ import annotations
 
@@ -277,6 +281,10 @@ class MainWindow(QMainWindow):
         footer.addWidget(self.progress_bar, 1)
         layout.addLayout(footer)
 
+        copyright_label = QLabel("Copyright (c) 2026 Jhon David (art. David Appleton). All rights reserved.")
+        copyright_label.setObjectName("Copyright")
+        layout.addWidget(copyright_label)
+
         self.setCentralWidget(root)
 
         copy_action = QAction("Copy", self)
@@ -453,6 +461,10 @@ class MainWindow(QMainWindow):
             #Subtitle {
                 color: #aab6c5;
                 font-size: 13px;
+            }
+            #Copyright {
+                color: #7f8da3;
+                font-size: 11px;
             }
             QGroupBox {
                 border: 1px solid #293241;

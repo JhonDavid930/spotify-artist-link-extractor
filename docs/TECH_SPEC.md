@@ -1,5 +1,7 @@
 # Technical Specification
 
+Copyright (c) 2026 Jhon David (art. David Appleton). All rights reserved.
+
 ## Architecture
 
 The app is split into four layers:
