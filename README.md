@@ -4,6 +4,8 @@ Desktop app in Python 3.11+ to extract official Spotify track links from a Spoti
 
 The app does not scrape Spotify pages, does not download audio, and only retrieves metadata plus official track URLs.
 
+It now includes a branded dark interface for creative users, with a premium app mark, clearer Spanish-facing actions, runtime Spotify credential setup, and offline 60-day license validation.
+
 ## Ownership
 
 Copyright (c) 2026 Jhon David (art. David Appleton). All rights reserved.
@@ -21,7 +23,7 @@ See [COPYRIGHT.md](COPYRIGHT.md) for the project authorship notice.
 - Skips the artist profile endpoint by default to reduce API usage in link-only mode.
 - Optional enrichment with ISRC, popularity, and preview URL.
 - Optional ISRC/popularity enrichment. It is disabled by default because new Spotify Developer Mode apps can rate-limit or block bulk metadata enrichment.
-- Modern PySide6 dark desktop UI with sortable/searchable table.
+- Modern branded PySide6 dark desktop UI with sortable/searchable table.
 - Exports CSV, TXT, Excel, and JSON.
 
 ## Create A Spotify Developer App
@@ -38,16 +40,44 @@ See [COPYRIGHT.md](COPYRIGHT.md) for the project authorship notice.
 
 This desktop tool uses the Client Credentials flow, so it does not need user login or playlist permissions.
 
-## Configure Environment
+## Configure API And License
 
-Copy `.env.example` to `.env` in this folder:
+The distributable build does not include Spotify credentials.
 
-```ini
-SPOTIFY_CLIENT_ID=your_client_id_here
-SPOTIFY_CLIENT_SECRET=your_client_secret_here
+On first launch, the app asks for:
+
+- Spotify Client ID
+- Spotify Client Secret
+- License key
+
+The values are stored locally in the user's system settings for this app.
+The Spotify Client Secret is protected with Windows DPAPI on Windows, the system keyring/keychain when available on macOS/Linux, or a local per-user encrypted fallback.
+
+## Create Customer Licenses
+
+The private license generator creates signed customer activation keys. The private signing key must stay outside Git in `tools/private/ed25519_private_key.txt` or in `SLE_LICENSE_PRIVATE_KEY_B64`.
+
+```bash
+python tools/create_license.py "Customer Name" --days 60
+python tools/create_license.py "Customer Name" --lifetime
+python tools/create_license.py "Customer Name" --days 60 --email customer@example.com --machine-code XXXXX-XXXXX-XXXXX-XXXXX
 ```
 
-Never commit `.env` to Git. Secrets stay local.
+The generated key must be pasted into the app setup dialog.
+The app contains only the public verification key, so a distributed `.exe` can verify licenses but cannot create them.
+
+## License Studio
+
+For internal use, open the private license UI with:
+
+```bash
+run_license_studio.bat
+```
+
+It lets you manage a private customer inventory, associate names and optional emails, bind a license to one device code, create lifetime licenses, renew the same customer/license ID, copy keys, save `.txt` files, and prepare an email draft.
+Do not distribute License Studio or `tools/private/`.
+
+The customer app warns when a valid license has 7 days or less remaining, so the user can renew before access expires.
 
 ## Install
 
@@ -65,6 +95,20 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+## Build For Distribution
+
+Builds are created per operating system. Run the build on the OS you want to distribute for:
+
+```bash
+python tools/build.py app
+```
+
+Internal License Studio:
+
+```bash
+python tools/build.py license-studio
+```
+
 ## Run
 
 ```bash
@@ -74,15 +118,20 @@ python app.py
 ## User Flow
 
 1. Open the app.
-2. Paste a Spotify artist, album, or track URL/URI.
-3. Choose market and album group options.
-4. Click **Extract Tracks**.
-5. Review the sortable/filterable results table.
-6. Export as CSV, TXT, Excel, or JSON.
+2. Enter Spotify API credentials and a valid license if the setup dialog appears.
+3. Paste a Spotify artist, album, or track URL/URI.
+4. Choose market and album group options.
+5. Click **Extract Tracks**.
+6. Review the sortable/filterable results table.
+7. Export as CSV, TXT, Excel, or JSON.
 
 ## Spotify Developer Mode Limits
 
 Spotify may apply strict rate limits to new Developer Mode apps. The app avoids long freezes by refusing to wait for very large `Retry-After` values. Full metadata enrichment can require many individual track requests when Spotify blocks batch metadata, so it is optional and disabled by default. For normal link extraction, leave **Enrich ISRC/popularity metadata** turned off.
+
+## Security Notes
+
+See [docs/SECURITY_AUDIT.md](docs/SECURITY_AUDIT.md) for the latest defensive audit, fixed findings, verification commands, and residual risks.
 
 The default link-only mode uses the smallest practical API surface:
 

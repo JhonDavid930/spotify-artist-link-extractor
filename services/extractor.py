@@ -18,6 +18,7 @@ class ExtractionOptions:
     only_main_artist_tracks: bool = True
     enrich_full_metadata: bool = False
     fetch_artist_profile: bool = False
+    skip_album_ids: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -74,14 +75,39 @@ class TrackRecord:
 
 
 ProgressCallback = Callable[[str, int, ExtractionStats], None]
+CancelCallback = Callable[[], bool]
+
+
+class ExtractionCancelled(RuntimeError):
+    """Raised when the user cancels extraction after a safe checkpoint."""
+
+    def __init__(
+        self,
+        message: str,
+        artist: SpotifyArtist | None = None,
+        records: list[TrackRecord] | None = None,
+        stats: ExtractionStats | None = None,
+        completed_album_ids: set[str] | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.artist = artist
+        self.records = records or []
+        self.stats = stats or ExtractionStats()
+        self.completed_album_ids = completed_album_ids or set()
 
 
 class SpotifyArtistExtractor:
     """Coordinates Spotify API calls and deterministic deduplication."""
 
-    def __init__(self, client: SpotifyClient, progress_callback: ProgressCallback | None = None) -> None:
+    def __init__(
+        self,
+        client: SpotifyClient,
+        progress_callback: ProgressCallback | None = None,
+        cancel_callback: CancelCallback | None = None,
+    ) -> None:
         self.client = client
         self.progress_callback = progress_callback
+        self.cancel_callback = cancel_callback
 
     def extract(self, artist_id: str, options: ExtractionOptions) -> tuple[SpotifyArtist, list[TrackRecord], ExtractionStats]:
         stats = ExtractionStats()
@@ -95,23 +121,33 @@ class SpotifyArtistExtractor:
         stats = ExtractionStats(albums_found=len(albums), albums_unique=len(albums_unique))
         self._emit("Fetching tracks", 35, stats)
 
+        skip_album_ids = set(options.skip_album_ids)
+        completed_album_ids = set(skip_album_ids)
         simplified_records: list[TrackRecord] = []
         for index, album in enumerate(albums_unique, start=1):
-            tracks = self.client.get_album_tracks(album["id"], options.market)
+            album_id = album.get("id", "")
+            if album_id in skip_album_ids:
+                continue
+            self._raise_if_cancelled(artist, simplified_records, stats, completed_album_ids)
+            tracks = self.client.get_album_tracks(album_id, options.market)
             for track in tracks:
                 if not track or not track.get("id"):
                     continue
                 if options.only_main_artist_tracks and not self._has_artist(track, artist.artist_id):
                     continue
                 simplified_records.append(self._build_record(artist, album, track, None))
+            if album_id:
+                completed_album_ids.add(album_id)
             progress = 35 + int((index / max(len(albums_unique), 1)) * 35)
+            unique_partial = self._dedupe_tracks_by_id(simplified_records)
             stats = ExtractionStats(
                 albums_found=len(albums),
                 albums_unique=len(albums_unique),
                 tracks_found=len(simplified_records),
-                tracks_unique=0,
+                tracks_unique=len(unique_partial),
             )
             self._emit("Fetching tracks", progress, stats)
+            self._raise_if_cancelled(artist, unique_partial, stats, completed_album_ids)
 
         unique_by_id = self._dedupe_tracks_by_id(simplified_records)
         stats = ExtractionStats(
@@ -127,6 +163,7 @@ class SpotifyArtistExtractor:
 
         full_tracks = {}
         if options.enrich_full_metadata:
+            self._raise_if_cancelled(artist, unique_by_id, stats, completed_album_ids)
             full_tracks = self.client.get_tracks([record.track_id for record in unique_by_id], options.market)
         enriched = [
             self._merge_full_track(record, full_tracks.get(record.track_id))
@@ -154,6 +191,7 @@ class SpotifyArtistExtractor:
         self.client.authenticate()
 
         self._emit("Fetching album tracks", 30, stats)
+        self._raise_if_cancelled()
         album = {
             "id": album_id,
             "name": "",
@@ -167,6 +205,7 @@ class SpotifyArtistExtractor:
             spotify_url=f"https://open.spotify.com/album/{album_id}",
         )
         tracks = self.client.get_album_tracks(album_id, options.market)
+        self._raise_if_cancelled()
         records = [self._build_record(artist, album, track, None) for track in tracks if track and track.get("id")]
         unique = self._dedupe_tracks_by_id(records)
         stats = ExtractionStats(albums_found=1, albums_unique=1, tracks_found=len(records), tracks_unique=len(unique))
@@ -208,6 +247,22 @@ class SpotifyArtistExtractor:
     def _emit(self, step: str, progress: int, stats: ExtractionStats) -> None:
         if self.progress_callback:
             self.progress_callback(step, progress, stats)
+
+    def _raise_if_cancelled(
+        self,
+        artist: SpotifyArtist | None = None,
+        records: list[TrackRecord] | None = None,
+        stats: ExtractionStats | None = None,
+        completed_album_ids: set[str] | None = None,
+    ) -> None:
+        if self.cancel_callback and self.cancel_callback():
+            raise ExtractionCancelled(
+                "Extracción detenida. Puedes continuar desde el último álbum completado.",
+                artist=artist,
+                records=records,
+                stats=stats,
+                completed_album_ids=completed_album_ids,
+            )
 
     def _dedupe_albums(self, albums: list[dict], by_name_release: bool) -> list[dict]:
         seen_ids: set[str] = set()

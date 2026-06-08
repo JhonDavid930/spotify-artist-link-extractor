@@ -44,7 +44,7 @@ class SpotifyClient:
 
     def __init__(self, client_id: str, client_secret: str, timeout: int = 30) -> None:
         if not client_id or not client_secret:
-            raise SpotifyAuthError("Faltan SPOTIFY_CLIENT_ID o SPOTIFY_CLIENT_SECRET en el archivo .env.")
+            raise SpotifyAuthError("Faltan Spotify Client ID o Spotify Client Secret en la configuración.")
         self.client_id = client_id
         self.client_secret = client_secret
         self.timeout = timeout
@@ -74,8 +74,11 @@ class SpotifyClient:
         if response.status_code != 200:
             raise SpotifyAuthError("Spotify rechazó la autenticación. Revisa Client ID y Client Secret.")
 
-        payload = response.json()
-        self._access_token = payload["access_token"]
+        try:
+            payload = response.json()
+            self._access_token = str(payload["access_token"])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise SpotifyAuthError("Spotify devolvió una respuesta de autenticación inválida.") from exc
         self._expires_at = time.time() + int(payload.get("expires_in", 3600)) - 60
 
     def get_artist(self, artist_id: str) -> SpotifyArtist:
@@ -184,7 +187,10 @@ class SpotifyClient:
                 continue
 
             if response.status_code == 429:
-                retry_after = int(response.headers.get("Retry-After", "1"))
+                try:
+                    retry_after = int(response.headers.get("Retry-After", "1"))
+                except ValueError:
+                    retry_after = 1
                 if self.rate_limit_callback:
                     self.rate_limit_callback(retry_after)
                 if retry_after > self.MAX_RATE_LIMIT_WAIT_SECONDS:
