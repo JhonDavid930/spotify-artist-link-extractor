@@ -2,6 +2,21 @@
 
 Copyright (c) 2026 Jhon David (art. David Appleton). All rights reserved.
 
+## 1.0.0 - 2026-06-12
+
+- Prepared the first distributable Windows release package for customers.
+- Added private License Studio for creating, renewing, suspending, revoking, reactivating, copying, saving, and emailing customer licenses.
+- Added customer inventory with optional email, device code binding, remaining-time status, lifetime licenses, and organized private license storage.
+- Added customer-facing activation keys with a cleaner grouped format while preserving signed offline validation.
+- Added optional machine-bound licenses using a customer-visible device code from the activation dialog.
+- Added secure runtime activation with Spotify credentials and customer license validation.
+- Added cross-platform build helper for Windows, macOS, and Linux PyInstaller builds.
+- Added macOS/Linux shell launchers and cross-platform secret protection through system keyring/keychain with encrypted local fallback.
+- Added resumable extraction, cancel support, manual expanded results view, and one-button export menu.
+- Added premium branding, dark interface refinements, Spanish customer-facing copy, and Spotify Developer shortcut.
+- Added security audit documentation, unit/security tests, and dependency vulnerability audit workflow.
+- Fixed License Studio private key discovery when running the packaged executable from `dist/`.
+
 ## 0.1.0 - 2026-05-27
 
 - Created PySide6 desktop app structure.

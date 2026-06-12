@@ -254,7 +254,9 @@ def _private_key_path() -> Path:
         Path(__file__).resolve().parents[1] / "tools" / "private" / "ed25519_private_key.txt",
     ]
     if getattr(sys, "frozen", False):
-        candidates.insert(0, Path(sys.executable).resolve().parent / "tools" / "private" / "ed25519_private_key.txt")
+        executable_dir = Path(sys.executable).resolve().parent
+        candidates.insert(0, executable_dir / "tools" / "private" / "ed25519_private_key.txt")
+        candidates.insert(1, executable_dir.parent / "tools" / "private" / "ed25519_private_key.txt")
     return next((path for path in candidates if path.exists()), candidates[0])
 
 
