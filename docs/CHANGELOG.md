@@ -2,6 +2,14 @@
 
 Copyright (c) 2026 Jhon David (art. David Appleton). All rights reserved.
 
+## Unreleased
+
+- Reorganized the documentation into separate customer, owner, troubleshooting, and developer paths.
+- Rewrote the repository entry page in Spanish for non-technical users.
+- Added a command-free customer installation and usage guide.
+- Added plain-language troubleshooting for credentials, licenses, API limits, extraction, and exports.
+- Added a private License Studio operations guide and a safer distribution checklist.
+
 ## 1.0.1 - 2026-09-22
 
 - Added real application screenshots to the repository README.

@@ -1,162 +1,98 @@
 # Spotify Artist Link Extractor
 
-Desktop app in Python 3.11+ to extract official Spotify track links from a Spotify artist profile using the Spotify Web API.
+Aplicación de escritorio para obtener y organizar los enlaces oficiales de las canciones publicadas en un perfil de artista, álbum o canción de Spotify.
 
-The app does not scrape Spotify pages, does not download audio, and only retrieves metadata plus official track URLs.
+Solo utiliza la API oficial de Spotify. No descarga audio, no extrae reproducciones y no modifica cuentas.
 
-It now includes a branded dark interface for creative users, with a premium app mark, clearer Spanish-facing actions, runtime Spotify credential setup, and offline license validation with configurable or lifetime terms.
+![Spotify Artist Link Extractor mostrando resultados](docs/images/app-main.jpg)
 
-## Project Preview
+## Elige tu guía
 
-### Spotify Artist Link Extractor
+No necesitas leer todo el repositorio. Abre únicamente la guía que corresponda a tu caso:
 
-![Spotify Artist Link Extractor showing extracted track results](docs/images/app-main.jpg)
+| Quiero... | Guía |
+| --- | --- |
+| Instalar y utilizar la aplicación | [Guía para clientes](docs/GUIA_CLIENTE.md) |
+| Resolver un error | [Solución de problemas](docs/SOLUCION_PROBLEMAS.md) |
+| Crear, renovar o administrar licencias | [Guía privada del propietario](docs/GUIA_PROPIETARIO.md) |
+| Ejecutar el código o generar un paquete | [Guía de desarrollo y empaquetado](docs/DEPLOY_GUIDE.md) |
+| Comprender la arquitectura | [Especificación técnica](docs/TECH_SPEC.md) |
 
-### Private License Studio
+## Inicio rápido para clientes
 
-![License Studio customer inventory and license management](docs/images/license-studio.jpg)
+1. Recibe el archivo `SpotifyArtistLinkExtractor-Windows.zip` del distribuidor.
+2. Descomprime el archivo.
+3. Abre `SpotifyArtistLinkExtractor.exe`.
+4. Introduce tu `Client ID`, `Client Secret` y licencia.
+5. Pega un enlace de Spotify y pulsa **Extraer enlaces**.
+6. Pulsa **Exportar** para guardar los resultados.
 
-License Studio is an internal administration tool. It is not included in customer distribution packages.
+La explicación completa, con todos los pasos y sin comandos, está en la [Guía para clientes](docs/GUIA_CLIENTE.md).
 
-## Ownership
+## Qué puedes hacer
 
-Copyright (c) 2026 Jhon David (art. David Appleton). All rights reserved.
+- Extraer todos los enlaces oficiales de las canciones de un artista.
+- Procesar enlaces de artista, álbum o canción.
+- Incluir álbumes, singles, apariciones y recopilatorios.
+- Buscar, ordenar, copiar y pausar resultados.
+- Continuar una extracción pausada sin repetir álbumes terminados.
+- Exportar a CSV, TXT, Excel y JSON.
+- Obtener opcionalmente ISRC y otros metadatos cuando la API lo permita.
+- Evitar duplicados por identificador de Spotify y, opcionalmente, por ISRC.
 
-See [COPYRIGHT.md](COPYRIGHT.md) for the project authorship notice.
+## Requisitos del cliente
 
-## Features
+- Un equipo con Windows 10 u 11 para el paquete de Windows.
+- Conexión a Internet.
+- Una cuenta gratuita de Spotify for Developers.
+- Credenciales `Client ID` y `Client Secret`.
+- Una licencia válida suministrada por el propietario del software.
 
-- Paste Spotify artist, album, or track URLs/URIs.
-- Supports `open.spotify.com/artist/...`, `/album/...`, `/track/...`, localized URLs like `/intl-es/artist/...`, query strings, and Spotify URIs.
-- Uses Spotify Client Credentials OAuth flow.
-- Fetches artist albums, singles, appears_on, and compilations with pagination.
-- Deduplicates albums and tracks.
-- Extracts official Spotify track URLs quickly from artist albums and singles.
-- Skips the artist profile endpoint by default to reduce API usage in link-only mode.
-- Optional enrichment with ISRC, popularity, and preview URL.
-- Optional ISRC/popularity enrichment. It is disabled by default because new Spotify Developer Mode apps can rate-limit or block bulk metadata enrichment.
-- Modern branded PySide6 dark desktop UI with sortable/searchable table.
-- Exports CSV, TXT, Excel, and JSON.
+El cliente no necesita instalar Python, Git ni utilizar una terminal.
 
-## Create A Spotify Developer App
+## Descargar la última versión
 
-1. Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard).
-2. Sign in with your Spotify account.
-3. Click **Create app**.
-4. Add an app name and description.
-5. Use any valid Redirect URI, for example `http://localhost:8888/callback`.
-6. Save the app.
-7. Open the app settings and copy:
-   - Client ID
-   - Client Secret
+El repositorio es privado. Los usuarios autorizados pueden consultar la [última Release](https://github.com/JhonDavid930/spotify-artist-link-extractor/releases/latest). Los clientes finales deben recibir el paquete de instalación directamente del distribuidor.
 
-This desktop tool uses the Client Credentials flow, so it does not need user login or playlist permissions.
+## Crear credenciales de Spotify
 
-## Configure API And License
+1. Abre [Spotify for Developers](https://developer.spotify.com/dashboard).
+2. Inicia sesión con tu cuenta de Spotify.
+3. Pulsa **Create app**.
+4. Escribe un nombre y una descripción.
+5. Si el formulario exige una dirección, añade `http://127.0.0.1:8888/callback` en **Redirect URI**.
+6. Marca **Web API**, acepta las condiciones y guarda.
+7. Abre **Settings** para ver el `Client ID` y el `Client Secret`.
 
-The distributable build does not include Spotify credentials.
+No compartas el `Client Secret` por mensajes, capturas ni documentos públicos.
 
-On first launch, the app asks for:
+La aplicación utiliza Client Credentials para consultar datos públicos y no inicia sesión en la cuenta del usuario. La dirección local anterior solo completa el registro de la aplicación en el Dashboard.
 
-- Spotify Client ID
-- Spotify Client Secret
-- License key
+## Vista de License Studio
 
-The values are stored locally in the user's system settings for this app.
-The Spotify Client Secret is protected with Windows DPAPI on Windows, the system keyring/keychain when available on macOS/Linux, or a local per-user encrypted fallback.
+![License Studio para administración privada](docs/images/license-studio.jpg)
 
-## Create Customer Licenses
+License Studio es una herramienta interna. No forma parte del paquete entregado a clientes y nunca debe distribuirse junto con la clave privada o el inventario de licencias.
 
-The private license generator creates signed customer activation keys. The private signing key must stay outside Git in `tools/private/ed25519_private_key.txt` or in `SLE_LICENSE_PRIVATE_KEY_B64`.
+## Seguridad y privacidad
 
-```bash
-python tools/create_license.py "Customer Name" --days 60
-python tools/create_license.py "Customer Name" --lifetime
-python tools/create_license.py "Customer Name" --days 60 --email customer@example.com --machine-code XXXXX-XXXXX-XXXXX-XXXXX
-```
+- Las credenciales se guardan localmente en el equipo del usuario.
+- La aplicación utiliza conexiones HTTPS con Spotify.
+- Las licencias se verifican sin incluir la clave privada en el programa del cliente.
+- `.env`, claves privadas, inventarios y paquetes locales están excluidos de Git.
+- Consulta la [auditoría de seguridad](docs/SECURITY_AUDIT.md) para información técnica.
 
-The generated key must be pasted into the app setup dialog.
-The app contains only the public verification key, so a distributed `.exe` can verify licenses but cannot create them.
+## Documentación
 
-## License Studio
+- [Guía para clientes](docs/GUIA_CLIENTE.md)
+- [Solución de problemas](docs/SOLUCION_PROBLEMAS.md)
+- [Guía privada del propietario](docs/GUIA_PROPIETARIO.md)
+- [Guía de desarrollo y empaquetado](docs/DEPLOY_GUIDE.md)
+- [Especificación técnica](docs/TECH_SPEC.md)
+- [Historial de cambios](docs/CHANGELOG.md)
 
-For internal use, open the private license UI with:
+## Autoría
 
-```bash
-run_license_studio.bat
-```
+Copyright (c) 2026 Jhon David (art. David Appleton). Todos los derechos reservados.
 
-It lets you manage a private customer inventory, associate names and optional emails, bind a license to one device code, create lifetime licenses, renew the same customer/license ID, copy keys, save `.txt` files, and prepare an email draft.
-Do not distribute License Studio or `tools/private/`.
-
-The customer app warns when a valid license has 7 days or less remaining, so the user can renew before access expires.
-
-## Install
-
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-On macOS/Linux:
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-## Build For Distribution
-
-Builds are created per operating system. Run the build on the OS you want to distribute for:
-
-```bash
-python tools/build.py app
-```
-
-Internal License Studio:
-
-```bash
-python tools/build.py license-studio
-```
-
-## Run
-
-```bash
-python app.py
-```
-
-## User Flow
-
-1. Open the app.
-2. Enter Spotify API credentials and a valid license if the setup dialog appears.
-3. Paste a Spotify artist, album, or track URL/URI.
-4. Choose market and album group options.
-5. Click **Extract Tracks**.
-6. Review the sortable/filterable results table.
-7. Export as CSV, TXT, Excel, or JSON.
-
-## Spotify Developer Mode Limits
-
-Spotify may apply strict rate limits to new Developer Mode apps. The app avoids long freezes by refusing to wait for very large `Retry-After` values. Full metadata enrichment can require many individual track requests when Spotify blocks batch metadata, so it is optional and disabled by default. For normal link extraction, leave **Enrich ISRC/popularity metadata** turned off.
-
-## Security Notes
-
-See [docs/SECURITY_AUDIT.md](docs/SECURITY_AUDIT.md) for the latest defensive audit, fixed findings, verification commands, and residual risks.
-
-The default link-only mode uses the smallest practical API surface:
-
-- list artist releases
-- list tracks inside each release
-- deduplicate by Spotify track ID
-
-It skips full track metadata and artist profile lookups.
-
-## Documentation
-
-Deep project documentation lives in:
-
-- [docs/TECH_SPEC.md](docs/TECH_SPEC.md)
-- [docs/DEPLOY_GUIDE.md](docs/DEPLOY_GUIDE.md)
-- [docs/CHANGELOG.md](docs/CHANGELOG.md)
+Consulta [COPYRIGHT.md](COPYRIGHT.md) para ver el aviso completo de autoría.
