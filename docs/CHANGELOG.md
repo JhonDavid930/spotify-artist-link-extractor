@@ -2,6 +2,13 @@
 
 Copyright (c) 2026 Jhon David (art. David Appleton). All rights reserved.
 
+## 1.0.1 - 2026-09-22
+
+- Added real application screenshots to the repository README.
+- Added a clean License Studio screenshot without exposing generated license keys.
+- Promoted the complete feature branch to the stable `main` release line.
+- Preserved the private repository visibility and excluded credentials, private signing keys, builds, and customer inventory from Git.
+
 ## 1.0.0 - 2026-06-12
 
 - Prepared the first distributable Windows release package for customers.

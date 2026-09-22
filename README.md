@@ -4,7 +4,19 @@ Desktop app in Python 3.11+ to extract official Spotify track links from a Spoti
 
 The app does not scrape Spotify pages, does not download audio, and only retrieves metadata plus official track URLs.
 
-It now includes a branded dark interface for creative users, with a premium app mark, clearer Spanish-facing actions, runtime Spotify credential setup, and offline 60-day license validation.
+It now includes a branded dark interface for creative users, with a premium app mark, clearer Spanish-facing actions, runtime Spotify credential setup, and offline license validation with configurable or lifetime terms.
+
+## Project Preview
+
+### Spotify Artist Link Extractor
+
+![Spotify Artist Link Extractor showing extracted track results](docs/images/app-main.jpg)
+
+### Private License Studio
+
+![License Studio customer inventory and license management](docs/images/license-studio.jpg)
+
+License Studio is an internal administration tool. It is not included in customer distribution packages.
 
 ## Ownership
 
